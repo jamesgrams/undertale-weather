@@ -1,0 +1,181 @@
+/*http://www.w3schools.com/css/css3_fonts.asp*/
+@font-face {
+	font-family: dtmsans;
+	src: url(dtmsans.otf);
+}
+
+html {
+	height: 100%;
+}
+
+body {
+	font-family: dtmsans;
+	background-color: black;
+	background-position: center top;
+}
+
+.play-pause, .plus-button, .cancel-button, .check-button, .celcius-button  {
+	background: none !important;
+}
+
+.cancel-button, .check-button, .celcius-button
+ {
+	background: none !important;
+	color: white !important;
+	font-family: dtmsans;
+	border: none;
+}
+
+.celcius-button {
+	padding-left: 30px !important;
+}
+
+.main-section {
+	background-image: url("../img/tauriel.png");
+	background-position: center center;
+	background-color: black;
+	background-repeat: no-repeat;
+	display: flex;
+	flex-direction: column;
+}
+
+.scroll {
+	width: 100% !important;
+}
+
+.scroll-section {
+	visibility: hidden;
+	flex: 2;
+	display: flex;
+	width: 100%;
+	align-items: center;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.dog-area {
+	width: 450%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: row;
+	position:relative;
+	left: 0;
+	height: 100%;
+}
+
+
+.weather-bearer {
+	width: 40%;
+	height: 30%;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	font-size: 100%;
+}
+
+.dog {
+	transition: all .2s linear;
+}
+
+.dog img {
+	width: 100%;
+	height: 100%;
+}
+
+.sign {
+	width: 90%;
+	text-align: center;
+	border: solid 5px;
+	margin: 5px;
+	padding: 20px;
+	font-size: 100%;
+	background-color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.button-area {
+	width: 100%;
+	background-color: black;
+	border: none !important;
+	float: bottom;
+}
+
+.button {
+	margin: 0 !important;
+}
+
+.dog-bar {
+	background-color: black !important;
+	opacity: 0.85 !important;
+}
+
+.title {
+	text-align: center !important;
+}
+
+.dog-button {
+	font-family: dtmsans;
+	background-color: black !important;
+	opacity: 0.85 !important;
+	color: white;
+	height: 45px;
+	border-bottom: 0px !important;
+	border-radius: 0;
+	width: 100%;
+}
+
+.dog-button:not(:first-child) {
+	border-top: 3px solid;
+	border-color: green !important;
+}
+
+.dog-scroll-element {
+	border-top: 3px solid;
+	border-bottom: 0;
+	border-color: green !important;
+	font-family: dtmsans;
+	background-color: black !important;
+	opacity: 0.85 !important;
+	color: white;
+	height: 45px;
+	display: block;
+	position: abosulte;
+}
+
+.popup {
+	background-color: black !important;
+	width: 50% !important;
+}
+
+.popup-head {
+	border-color: green !important;
+	border-bottom: solid 3px;
+}
+
+.popup-text {
+	font-family: dtmsans;
+	color: white;
+	text-align: center !important;
+}
+
+.could-not-connect-text {
+	width: 100%;
+	display: none;
+	text-align: center;
+	color:white;
+}
+
+/*https://forum.ionicframework.com/t/solved-how-to-hide-scroll-bar/14330/2*/
+.scroll-bar {
+	display: none !important;
+}
+
+.slider {
+	max-height: 47px;
+	overflow-y: hidden;
+}
