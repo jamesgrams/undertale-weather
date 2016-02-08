@@ -3,14 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title></title>
+    <title>Greater Weather</title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-
-    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
-    <link href="css/ionic.app.css" rel="stylesheet">
-    -->
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
@@ -21,42 +17,52 @@
     <!-- your app's js -->
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
-    <script src="js/services.js"></script>
+    <script src="js/factories.js"></script>
   </head>
   <body ng-app="weather" ng-controller="MainCtrl">
-    <!--
-      The nav bar that will be updated as we navigate between views.
-    -->
     <ion-header-bar class="bar-dark dog-bar">
-		<button class = "button icon ion-plus plus-button" ng-click="newLocation()"></button>
-		<button class = "button icon celcius-button" ng-click="toggleDegrees()">C</button>
-		<div class = "title">Greater Weather</div>
-		<button class = "button icon ion-pause play-pause" ng-click="toggleStopStart()"></button>
+		<button class="button icon ion-plus plus-button" ng-click="newLocation()"></button>
+		<button class="button icon celcius-button" ng-click="toggleDegrees()">C</button>
+		<div class="title">Greater Weather</div>
+		<button class="button icon ion-pause play-pause" ng-click="toggleStopStart()"></button>
     </ion-header-bar>
 	
-	
-	<ion-content scroll="false" class="main-section">
+	<ion-content scroll="false" class="main-section" on-swipe-down="refreshWeather()">
 		<!--http://stackoverflow.com/questions/27645279/skip-first-item-in-ng-repeat-->
-		<div class = "could-not-connect-text">Really not accessing the network right now.</br> Tap to try again.</div>	
-		<ion-scroll class = "scroll-section" on-swipe-down="weatherize()" scrollbar-x="false" delegate-handle="dogScroll" direction="x" on-touch="stopDog()">
-			<div class = "dog-area">
-					<div class = "weather-bearer" ng-repeat = "item in currentArray[currentIndex]" ng-if = "$index > 0">
-						<div class = "sign">
-							<div class = "information">
-								{{item[0]}}</br>
-								{{item[1]}}
+		<div class="could-not-connect-text">
+			Really not accessing the network right now.<br> Swipe down to try again.
+		</div>	
+		<ion-scroll class="scroll-section" scrollbar-x="false" delegate-handle="dogScroll" direction="x" on-touch="stopDog()">
+			<div class="dog-area">
+					<div class="weather-bearer" ng-repeat="(weatherTypeTitle, weatherDetails) in weatherInformationForTime[timeIndex]" ng-if="$index > 0">
+						<div class="sign">
+							<div class="information">
+								{{weatherDetails.label}}<br>
+								{{weatherDetails.information}}
 							</div>
 						</div>
-						<div class = "dog" ng-style="{'transform': 'scale('+scale+', 1)'}">
-							<img src = "img/dog.gif"/>
+						<div class="dog">
+							<img src="img/dog.gif"/>
 						</div>
 					</div>	
 			</div>
 		</ion-scroll>
-		<div class = "button-area">
-			<button class = "button button-dark dog-button to-hide" ng-click="toggleTimeLength()">{{timeLength}}</button>
-			<ion-slide-box class = "to-hide" delegate-handle="timeBox" show-pager = "false" auto-play="false" active-slide="currentIndex" on-slide-changed="changeTime($index)"><ion-slide ng-repeat = "element in currentArray"><div class = "button button-dark button-full dog-scroll-element">{{element[0][1]}}</div></ion-slide></ion-slide></ion-slide-box>
-			<ion-slide-box delegate-handle="locationsBox" show-pager = "false" auto-play="false" on-slide-changed="changeLocations($index)"><ion-slide ng-repeat = "element in locations"><div class = "button button-dark button-full dog-scroll-element" on-hold="showDelete()">{{element[0]}}</div></ion-slide></ion-slide></ion-slide-box>
+		<div class="button-area">
+			<button class="button button-dark dog-button to-hide" ng-click="toggleTimeLength()">{{timeLength}}</button>
+			<ion-slide-box class="to-hide" delegate-handle="timeBox" show-pager="false" auto-play="false" active-slide="currentIndex" on-slide-changed="changeTime($index)">
+				<ion-slide ng-repeat = "timePeriod in weatherInformationForTime">
+					<div class = "button button-dark button-full dog-scroll-element">
+						{{timePeriod['time'].information}}
+					</div>
+				</ion-slide>
+			</ion-slide-box>
+			<ion-slide-box class="to-hide" delegate-handle="locationsBox" show-pager = "false" auto-play="false" on-slide-changed="changeLocations($index)">
+				<ion-slide ng-repeat = "location in locations">
+					<div class = "button button-dark button-full dog-scroll-element" on-hold="showDelete()">
+						{{location['name']}}
+					</div>
+				</ion-slide>
+			</ion-slide-box>
 		</div>	
 	</ion-content>
 	

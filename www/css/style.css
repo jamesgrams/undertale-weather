@@ -44,9 +44,8 @@ body {
 }
 
 .scroll-section {
-	visibility: hidden;
 	flex: 2;
-	display: flex;
+	display: none;
 	width: 100%;
 	align-items: center;
 	flex-direction: row;
@@ -178,4 +177,8 @@ body {
 .slider {
 	max-height: 47px;
 	overflow-y: hidden;
+}
+
+.to-hide {
+	display: none;
 }
