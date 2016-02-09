@@ -66,7 +66,8 @@ app.controller('MainCtrl',
 				console.dir($scope.locations);
 				var city = $scope.locations[$scope.locationsIndex];
 				DisplayFactory.chooseBackground(city, $scope.timeIndex);
-				DisplayFactory.resetDogAreaWidth();
+				var length = DisplayFactory.getDogAreaWidth(city, $scope.timeIndex);
+				DisplayFactory.resetDogAreaWidth(length);
 				DisplayFactory.restartAnimation(false);
 			}
 		}
@@ -235,13 +236,13 @@ app.controller('MainCtrl',
 			for(var i = 0; i < $scope.locations.length; i++) {
 				saveLocations.push( {'name':$scope.locations[i].name, 'longitude':$scope.locations[i].longitude, 'latitude':$scope.locations[i].latitude, 'timezoneOffset':$scope.locations[i].timezoneOffset, 'celcius':$scope.locations[i].celcius} );
 			}
-			window.localStorage['GreaterWeatherP'] = JSON.stringify(saveLocations);
+			window.localStorage['GreaterWeatherCities'] = JSON.stringify(saveLocations);
 		} 
 		
 		/* Load the locations that are saved or load Charlotte's data if no save data exists
 		*/
 		var load = function() {
-			var loadedLocations = JSON.parse(window.localStorage['GreaterWeatherP'] || "[]");
+			var loadedLocations = JSON.parse(window.localStorage['GreaterWeatherCities'] || "[]");
 			var celcius = false;
 			
 			if(loadedLocations == 0) {
