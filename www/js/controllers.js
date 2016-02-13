@@ -20,7 +20,6 @@ app.controller('MainCtrl',
 		/* Stop the dogs
 		*/
 		$scope.stopDog = function() {
-			console.dir($scope.locations);
 			if(!DisplayFactory.getStopped()) {
 				DisplayFactory.toggleStopStart();
 			}
@@ -30,7 +29,6 @@ app.controller('MainCtrl',
 		 * @returns	boolean		If the display is hourly
 		*/
 		$scope.toggleDegrees = function() {
-			console.log($scope.locations.length);
 			for(var i = 0; i < $scope.locations.length; i++) {
 				$scope.locations[i].toggleCelcius();
 			}
@@ -63,12 +61,18 @@ app.controller('MainCtrl',
 		$scope.changeTime = function(index) {
 			if(index != $scope.timeIndex) {
 				$scope.timeIndex = index;
-				console.dir($scope.locations);
 				var city = $scope.locations[$scope.locationsIndex];
+				if(DisplayFactory.getDisplayHours()) {
+					city.setInfoOrder(index, true);
+				}
+				else {
+					city.setInfoOrder(index, false);
+				}
 				DisplayFactory.chooseBackground(city, $scope.timeIndex);
 				var length = DisplayFactory.getDogAreaWidth(city, $scope.timeIndex);
 				DisplayFactory.resetDogAreaWidth(length);
 				DisplayFactory.restartAnimation(false);
+				window.setTimeout(DisplayFactory.setDogsDirection, 10);
 			}
 		}
 		
@@ -178,13 +182,16 @@ app.controller('MainCtrl',
 		/* Display the weather based on the selected location and time
 		*/
 		var displayCurrentWeather = function() {
+			var city = $scope.locations[$scope.locationsIndex];
 			if(DisplayFactory.getDisplayHours()) {
 				$scope.weatherInformationForTime = $scope.locations[$scope.locationsIndex].hours;
+				city.setInfoOrder($scope.timeIndex, true);
 			}
 			else {
 				$scope.weatherInformationForTime = $scope.locations[$scope.locationsIndex].days;
+				city.setInfoOrder($scope.timeIndex, false);
 			}
-			DisplayFactory.resetCity($scope.locations[$scope.locationsIndex], $scope.timeIndex, $scope.locationsIndex);
+			DisplayFactory.resetCity(city , $scope.timeIndex, $scope.locationsIndex);
 		}
 		
 		/* Refresh the weather displayed
@@ -224,7 +231,6 @@ app.controller('MainCtrl',
 				$scope.locationsIndex -= 1;
 			}
 			else {
-				console.log($scope.locationsIndex);
 			}
 			displayCurrentWeather(); 
 		}

@@ -14,6 +14,7 @@ app.factory('City',
 			this.timezoneOffset = "";
 			this.hours = [];
 			this.days = [];
+			this.order = [];
 			this.celcius = false;
 		}
 		
@@ -298,7 +299,7 @@ app.factory('City',
 						var displayAccumulation = precipAccumulation;
 						var displayUnit = "in";
 					}
-					this.hours[i]['precipAccumulation'] = {'label':precipType + "fall", 'information':displayAccumulation+displayUnit, 'actual':precipAccumulation, 'actualCelcius':celciusPrecipAccumilation};
+					this.days[i]['precipAccumulation'] = {'label':precipType + "fall", 'information':displayAccumulation+displayUnit, 'actual':precipAccumulation, 'actualCelcius':celciusPrecipAccumilation};
 				}
 				this.days[i]['feelsHigh'] = {'label':"Feels High", 'information': displayFeelsTempMax + "°", 'actual':feelsTempMin, 'actualCelcius':celciusFeelsTempMin};
 				this.days[i]['feelsLow'] = {'label':"Feels Low", 'information': displayFeelsTempMin + "°", 'actual':feelsTempMax, 'actualCelcius':celciusFeelsTempMax};
@@ -308,6 +309,31 @@ app.factory('City',
 				this.days[i]['humidity'] = {'label':"Humidity", 'information': Math.round(daysData[i].humidity * 100) + "%"};
 				this.days[i]['moonPhase'] = {'label':"Moon Phase", 'information': Math.round(daysData[i].moonPhase * 100) + "%"};
 				this.days[i]['poweredBy'] = {'label':"Powered By", 'information': "Forecast.io"};
+			}
+		}
+		
+		/* Initialize the order array specifying the order of the hourly or daily dogs
+		 * @param	int			index	The index of the hours array to set the order for
+		 * @param	boolean		hours	True if setting to hours
+		*/
+		City.prototype.setInfoOrder = function(index, hours) {
+			if(hours) {
+				var precipAccumulation = this.hours[index].precipAccumulation;
+				if(precipAccumulation != undefined) {
+					this.order = ['time','temperature','feels', 'precipProb', 'precipAccumulation', 'windSpeed', 'humidity', 'poweredBy']; 
+				}
+				else {
+					this.order = ['time','temperature','feels', 'precipProb', 'windSpeed', 'humidity', 'poweredBy']; 
+				}
+			}
+			else {
+				var precipAccumulation = this.days[index].precipAccumulation;
+				if(precipAccumulation != undefined) {
+					this.order = ['time','high','low', 'precipAccumulation', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy']; 
+				}
+				else {
+					this.order = ['time','high','low', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy'];
+				}
 			}
 		}
 		
@@ -402,10 +428,7 @@ app.factory('DisplayFactory',
 				directionRight = false;
 				$ionicScrollDelegate.$getByHandle('dogScroll').scrollTo(0,0);
 				$ionicSlideBoxDelegate.$getByHandle('timeBox').slide(0);
-				var dogs = document.getElementsByClassName("dog");
-				for(var i = 0; i < dogs.length; i++) {
-					dogs[i].style.transform = 'scale('+dogScale+', 1)';
-				}
+				this.setDogsDirection();
 			}
 			
 			if(!stopped) {	
@@ -446,11 +469,17 @@ app.factory('DisplayFactory',
 		*/
 		DisplayFactory.flipDogs = function() {
 			dogScale = -dogScale;
+			this.setDogsDirection();
+			this.restartAnimation(false); 
+		}
+		
+		/* Set the dogs direction
+		*/
+		DisplayFactory.setDogsDirection = function() {
 			var dogs = document.getElementsByClassName("dog");
 			for(var i = 0; i < dogs.length; i++) {
 				dogs[i].style.transform = 'scale('+dogScale+', 1)';
 			}
-			this.restartAnimation(false); 
 		}
 		
 		/* Get the length of the array holding the dogs based on parameters
@@ -479,6 +508,7 @@ app.factory('DisplayFactory',
 		DisplayFactory.resetDogAreaWidth = function(length) {
 			$ionicSlideBoxDelegate.$getByHandle('timeBox').update();
 			document.getElementsByClassName('dog-area')[0].style.width = (length) * 50 + "%";
+			$ionicScrollDelegate.resize();
 		}
 		
 		/* Choose the appropriate background based on the weather

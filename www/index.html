@@ -34,11 +34,11 @@
 		</div>	
 		<ion-scroll class="scroll-section" scrollbar-x="false" delegate-handle="dogScroll" direction="x" on-touch="stopDog()">
 			<div class="dog-area">
-					<div class="weather-bearer" ng-repeat="(weatherTypeTitle, weatherDetails) in weatherInformationForTime[timeIndex]" ng-if="$index > 0">
+					<div class="weather-bearer" ng-repeat="weatherType in locations[locationsIndex].order" ng-if="$index > 0">
 						<div class="sign">
 							<div class="information">
-								{{weatherDetails.label}}<br>
-								{{weatherDetails.information}}
+								{{weatherInformationForTime[timeIndex][weatherType].label}}</br>
+								{{weatherInformationForTime[timeIndex][weatherType].information}}
 							</div>
 						</div>
 						<div class="dog">
