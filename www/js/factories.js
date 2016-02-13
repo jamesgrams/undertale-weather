@@ -253,8 +253,8 @@ app.factory('City',
 				}
 				var tempMax = daysData[i].temperatureMax;
 				var tempMin = daysData[i].temperatureMin;
-				var feelsTempMin = daysData[i].apparentTemperatureMax;
-				var feelsTempMax = daysData[i].apparentTemperatureMin;
+				var feelsTempMin = daysData[i].apparentTemperatureMin;
+				var feelsTempMax = daysData[i].apparentTemperatureMax;
 				
 				var celciusTempMax = WeatherFactory.toCelcius(tempMax);
 				var celciusTempMin = WeatherFactory.toCelcius(tempMin);
@@ -301,8 +301,8 @@ app.factory('City',
 					}
 					this.days[i]['precipAccumulation'] = {'label':precipType + "fall", 'information':displayAccumulation+displayUnit, 'actual':precipAccumulation, 'actualCelcius':celciusPrecipAccumilation};
 				}
-				this.days[i]['feelsHigh'] = {'label':"Feels High", 'information': displayFeelsTempMax + "°", 'actual':feelsTempMin, 'actualCelcius':celciusFeelsTempMin};
-				this.days[i]['feelsLow'] = {'label':"Feels Low", 'information': displayFeelsTempMin + "°", 'actual':feelsTempMax, 'actualCelcius':celciusFeelsTempMax};
+				this.days[i]['feelsHigh'] = {'label':"Feels High", 'information': displayFeelsTempMax + "°", 'actual':feelsTempMax, 'actualCelcius':celciusFeelsTempMax};
+				this.days[i]['feelsLow'] = {'label':"Feels Low", 'information': displayFeelsTempMin + "°", 'actual':feelsTempMin, 'actualCelcius':celciusFeelsTempMin};
 				this.days[i]['sunrise'] = {'label':"Sunrise", 'information': TimeFactory.epochToTime(daysData[i].sunriseTime + this.timezoneOffset + userOffset), 'actual': daysData[i].sunriseTime + this.timezoneOffset + userOffset};
 				this.days[i]['sunset'] = {'label':"Sunset", 'information': TimeFactory.epochToTime(daysData[i].sunsetTime + this.timezoneOffset + userOffset), 'actual': daysData[i].sunsetTime + this.timezoneOffset + userOffset};
 				this.days[i]['windSpeed'] = {'label':"Wind Speed", 'information': daysData[i].windSpeed + "mph"};
