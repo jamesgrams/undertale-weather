@@ -182,7 +182,7 @@ app.factory('City',
 				var resource;
 				if(i == 0) {
 					resource = responseData.currently;
-					this.hours[i]['time'] = {'label':'Time', 'information':'Now', 'actual': responseData.currently.time};
+					this.hours[i]['time'] = {'label':'Time', 'information':'Now', 'actual': responseData.currently.time + this.timezoneOffset + userOffset};
 				}
 				else {
 					resource = hoursData[i];
