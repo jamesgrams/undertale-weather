@@ -163,8 +163,8 @@ app.factory('City',
 			DisplayFactory.loadingBackground();
 			var self = this;
 			WeatherFactory.getCurrentWeather(this.latitude, this.longitude).then(function(resp) {
-				self.initializeHours(resp.data);
-				self.initializeDays(resp.data);
+				self.initializeHours(resp.data.hourlyData);
+				self.initializeDays(resp.data.dailyData);
 				callback();
 			}, function(error) {
 				DisplayFactory.errorBackground();
@@ -173,24 +173,17 @@ app.factory('City',
 		
 		/* Initialize the hours array that
 		 * Contains information about current weather data and the next 9 hours
-		 * @param	object	responseData	The data received from weather.io about the weather
+		 * @param	object	hoursData	The data received about hourly weather data
 		*/
-		City.prototype.initializeHours = function(responseData) {
-			var hoursData = responseData.hourly.data;
+		City.prototype.initializeHours = function(hoursData) {
 			var userOffset = new Date().getTimezoneOffset() * 60;
 			for(var i = 0; i < 10; i++) {
 				this.hours[i] = {};
 				var resource;
-				if(i == 0) {
-					resource = responseData.currently;
-					this.hours[i]['time'] = {'label':'Time', 'information':'Now', 'actual': responseData.currently.time + this.timezoneOffset + userOffset};
-				}
-				else {
-					resource = hoursData[i];
-					this.hours[i]['time'] = {'label':'Time', 'information':TimeFactory.epochToHour(hoursData[i].time + this.timezoneOffset + userOffset), 'actual':hoursData[i].time + this.timezoneOffset + userOffset};
-				}
-				var temp = resource.temperature;
-				var feelsTemp = resource.apparentTemperature;
+				resource = hoursData[i];
+				this.hours[i]['time'] = {'label':'Time', 'information':TimeFactory.epochToHour(hoursData[i].time + this.timezoneOffset + userOffset), 'actual':hoursData[i].time + this.timezoneOffset + userOffset};
+				var temp = resource.temp;
+				var feelsTemp = resource.feels;
 				var celciusTemp = WeatherFactory.toCelcius(temp);
 				var celciusFeels = WeatherFactory.toCelcius(feelsTemp);
 				if(this.celcius) {
@@ -204,8 +197,8 @@ app.factory('City',
 				this.hours[i]['temperature'] = {'label':"Temp", 'information': displayTemp + "°", 'actual':temp, 'actualCelcius': celciusTemp};
 				this.hours[i]['feels'] = {'label':"Feels", 'information': displayFeels + "°", 'actual':feelsTemp, 'actualCelcius': celciusFeels};
 				var precipType = resource.precipType;
-				if(precipType == undefined) {
-					if(resource.temperature <= 32) {
+				if(precipType == "None") {
+					if(resource.temp <= 32) {
 						precipType = "Snow";
 					}
 					else {
@@ -215,10 +208,10 @@ app.factory('City',
 				else {
 					precipType = precipType.charAt(0).toUpperCase() + precipType.slice(1);
 				}
-				this.hours[i]['precipProb'] = {'label':precipType, 'information':Math.round(resource.precipProbability * 100) + "%"};
+				this.hours[i]['precipProb'] = {'label':precipType, 'information':Math.round(resource.precipProb * 100) + "%"};
 				//Note, use hoursData[i] here because current accumulation is never defined
 				var precipAccumulation = hoursData[i].precipAccumulation;
-				if(precipAccumulation != undefined) {
+				if(precipAccumulation != 0) {
 					var celciusPrecipAccumilation = WeatherFactory.toCm(precipAccumulation);
 					if(this.celcius) {
 						var displayAccumulation = celciusPrecipAccumilation;
@@ -238,10 +231,9 @@ app.factory('City',
 		
 		/* Initialize the days array that
 		 * Contains information about current weather data and the next 9 hours
-		 * @param	object	responseData	The data received from weather.io about the weather
+		 * @param	object	daysData	The data received about daily weather data
 		*/
-		City.prototype.initializeDays = function(responseData) {
-			var daysData = responseData.daily.data;
+		City.prototype.initializeDays = function(daysData) {
 			var userOffset = new Date().getTimezoneOffset() * 60;
 			for(var i = 0; i < 7; i++) {
 				this.days[i] = {};
@@ -251,10 +243,10 @@ app.factory('City',
 				else {
 					this.days[i]['time'] = {'label':'Day', 'information':TimeFactory.epochToDayOfWeek(daysData[i].time + this.timezoneOffset + userOffset)};
 				}
-				var tempMax = daysData[i].temperatureMax;
-				var tempMin = daysData[i].temperatureMin;
-				var feelsTempMin = daysData[i].apparentTemperatureMin;
-				var feelsTempMax = daysData[i].apparentTemperatureMax;
+				var tempMax = daysData[i].high;
+				var tempMin = daysData[i].low;
+				var feelsTempMin = daysData[i].feelsLow;
+				var feelsTempMax = daysData[i].feelsHigh;
 				
 				var celciusTempMax = WeatherFactory.toCelcius(tempMax);
 				var celciusTempMin = WeatherFactory.toCelcius(tempMin);
@@ -277,8 +269,8 @@ app.factory('City',
 				this.days[i]['high'] = {'label':"High", 'information': displayTempMax + "°", 'actual':tempMax, 'actualCelcius':celciusTempMax};
 				this.days[i]['low'] = {'label':"Low", 'information': displayTempMin + "°", 'actual':tempMin, 'actualCelcius':celciusTempMin};
 				var precipType = daysData[i].precipType;
-				if(precipType == undefined) {
-					if(daysData[i].temperature <= 32) {
+				if(precipType == "None") {
+					if(daysData[i].temp <= 32) {
 						precipType = "Snow";
 					}
 					else {
@@ -289,7 +281,7 @@ app.factory('City',
 					precipType = precipType.charAt(0).toUpperCase() + precipType.slice(1);
 				}
 				var precipAccumulation = daysData[i].precipAccumulation;
-				if(precipAccumulation != undefined) {
+				if(precipAccumulation != 0) {
 					var celciusPrecipAccumilation = WeatherFactory.toCm(precipAccumulation);
 					if(this.celcius) {
 						var displayAccumulation = celciusPrecipAccumilation;
@@ -303,8 +295,8 @@ app.factory('City',
 				}
 				this.days[i]['feelsHigh'] = {'label':"Feels High", 'information': displayFeelsTempMax + "°", 'actual':feelsTempMax, 'actualCelcius':celciusFeelsTempMax};
 				this.days[i]['feelsLow'] = {'label':"Feels Low", 'information': displayFeelsTempMin + "°", 'actual':feelsTempMin, 'actualCelcius':celciusFeelsTempMin};
-				this.days[i]['sunrise'] = {'label':"Sunrise", 'information': TimeFactory.epochToTime(daysData[i].sunriseTime + this.timezoneOffset + userOffset), 'actual': daysData[i].sunriseTime + this.timezoneOffset + userOffset};
-				this.days[i]['sunset'] = {'label':"Sunset", 'information': TimeFactory.epochToTime(daysData[i].sunsetTime + this.timezoneOffset + userOffset), 'actual': daysData[i].sunsetTime + this.timezoneOffset + userOffset};
+				this.days[i]['sunrise'] = {'label':"Sunrise", 'information': TimeFactory.epochToTime(daysData[i].sunrise + this.timezoneOffset + userOffset), 'actual': daysData[i].sunriseTime + this.timezoneOffset + userOffset};
+				this.days[i]['sunset'] = {'label':"Sunset", 'information': TimeFactory.epochToTime(daysData[i].sunset + this.timezoneOffset + userOffset), 'actual': daysData[i].sunsetTime + this.timezoneOffset + userOffset};
 				this.days[i]['windSpeed'] = {'label':"Wind Speed", 'information': daysData[i].windSpeed + "mph"};
 				this.days[i]['humidity'] = {'label':"Humidity", 'information': Math.round(daysData[i].humidity * 100) + "%"};
 				this.days[i]['moonPhase'] = {'label':"Moon Phase", 'information': Math.round(daysData[i].moonPhase * 100) + "%"};
@@ -647,7 +639,7 @@ app.factory('WeatherFactory',
 	function($http) {
 		var weatherFactory = {};
 		
-		var FORECAST_IO_URL = 'https://api.forecast.io/forecast/';
+		var GREATER_WEATHER_CACHE_URL = 'http://greater-weather-caching.appspot.com/';
 		var GOOGLE_GEOCODING_URL = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
 		var GOOGLE_TIMEZONE_URL = 'https://maps.googleapis.com/maps/api/timezone/json?location=';
 		
@@ -658,14 +650,9 @@ app.factory('WeatherFactory',
 		 * @param	string	time	The time to get the weather for (null if now)
 		 * @return	object			Promise for the weather data
 		*/
-		weatherFactory.getCurrentWeather = function(lat, lng, time) {
-			var url = FORECAST_IO_URL + FORECAST_KEY + '/';
-			var fullUrl = url + lat + ',' + lng;
-			if(time != null) {
-				fullUrl += ',' + time;
-			}
-			fullUrl +='?callback=JSON_CALLBACK';
-			return $http.jsonp(fullUrl);
+		weatherFactory.getCurrentWeather = function(lat, lng) {
+			var fullUrl = GREATER_WEATHER_CACHE_URL + '/' + lat + '/' + lng + '/all';
+			return $http.get(fullUrl);
 		}
 		
 		/*
