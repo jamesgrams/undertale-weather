@@ -293,7 +293,7 @@ app.controller('MainCtrl',
 		*/
 		var load = function() {
 			var loadedLocations = JSON.parse(window.localStorage['GreaterWeatherCities'] || "[]");
-			var loadedMute = JSON.parse(window.localStorage['GreaterWeatherMute'] || "[]");
+			var loadedMute = JSON.parse(window.localStorage['GreaterWeatherMute'] || false);
 			var celcius = false;
 			
 			if(loadedLocations == 0) {
@@ -314,10 +314,8 @@ app.controller('MainCtrl',
 			if(celcius) {
 				document.getElementsByClassName('celcius-button')[0].innerHTML = "F";
 			}
-			console.log(loadedMute);
 			DisplayFactory.setMute(false);
 			if(loadedMute) {
-				console.log("llama baseball bananza!");
 				$scope.toggleMute();
 			}
 		}
