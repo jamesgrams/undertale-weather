@@ -1,6 +1,6 @@
 # Greater Weather
 
-Weather app built in IONIC. This app's theme is the game, 'Undertale.'
+Weather app built in IONIC. This app's theme is the game, 'Undertale.'  
 The app allows the user to fetch weather information for any location.
 Weather data includes six days into the future, and nine hours into the
 future. 
