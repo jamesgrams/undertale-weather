@@ -244,12 +244,12 @@ app.factory('City',
 				this.days[i] = {};
 				if(i == 0) {
 					this.days[i]['time'] = {'label':'Day', 'information':'Today'};
+					//Make a copy, this works since this function is called after initializeHours
+					this.days[i].temperature = this.hours[i].temperature;
 				}
 				else {
 					this.days[i]['time'] = {'label':'Day', 'information':TimeFactory.epochToDayOfWeek(daysData[i].time + this.timezoneOffset + userOffset)};
 				}
-				//Make a copy, this works since this function is called after initializeHours
-				this.days[i].temperature = this.hours[i].temperature;
 				
 				var tempMax = daysData[i].high;
 				var tempMin = daysData[i].low;
@@ -328,11 +328,22 @@ app.factory('City',
 			}
 			else {
 				var precipAccumulation = this.days[index].precipAccumulation;
+				var temperature = this.days[index].temperature;
 				if(precipAccumulation != undefined) {
-					this.order = ['time','temperature','high','low', 'precipAccumulation', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy']; 
+					if(temperature != undefined) {
+						this.order = ['time','temperature','high','low', 'precipAccumulation', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy']; 
+					}
+					else {
+						this.order = ['time','high','low', 'precipAccumulation', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy']; 
+					}
 				}
 				else {
-					this.order = ['time','temperature','high','low', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy'];
+					if(temperature != undefined) {
+						this.order = ['time','temperature','high','low', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy'];
+					}
+					else {
+						this.order = ['time','high','low', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy'];
+					}
 				}
 			}
 		}
