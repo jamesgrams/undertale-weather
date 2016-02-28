@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>Greater Weather</title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/factories.js"></script>
+  </head>
+  <body ng-app="weather" ng-controller="MainCtrl">
+    <ion-header-bar class="bar-dark dog-bar">
+		<button class="button icon ion-plus plus-button" ng-click="newLocation()"></button>
+		<button class="button icon celcius-button" ng-click="toggleDegrees()">C</button>
+		<div class="title">Greater Weather</div>
+		<button class="button icon ion-volume-mute mute-button" ng-click="toggleMute()"></button>
+		<button class="button icon ion-pause play-pause" ng-click="toggleStopStart()"></button>
+    </ion-header-bar>
+	
+	<ion-content scroll="false" class="main-section" on-swipe-down="refreshWeather()">
+		<!--http://stackoverflow.com/questions/27645279/skip-first-item-in-ng-repeat-->
+		<div class="could-not-connect-text">
+			Really not accessing the network right now.<br> Swipe down to try again.
+		</div>	
+		<ion-scroll class="scroll-section" scrollbar-x="false" delegate-handle="dogScroll" direction="x" on-touch="stopDog()">
+			<div class="dog-area">
+					<div class="weather-bearer" ng-repeat="weatherType in locations[locationsIndex].order" ng-if="$index > 0">
+						<div class="sign">
+							<div class="information">
+								{{weatherInformationForTime[timeIndex][weatherType].label}}</br>
+								{{weatherInformationForTime[timeIndex][weatherType].information}}
+							</div>
+						</div>
+						<div class="dog">
+							<img src="img/dog.gif"/>
+						</div>
+					</div>	
+			</div>
+		</ion-scroll>
+		<div class="button-area">
+			<ion-slide-box class="to-hide" delegate-handle="periodBox" show-pager="false" auto-play="false" on-slide-changed="toggleTimeLength()">
+				<ion-slide>
+					<div class = "dog-scroll-element">
+						<div class="icon ion-arrow-left-b left-arrow hide-me"></div>
+						Hourly
+						<div class="icon ion-arrow-right-b right-arrow" ng-click="toggleTimeLengthArrow()"></div>
+					</div>
+				</ion-slide>
+				<ion-slide>
+					<div class = "dog-scroll-element">
+						<div class="icon ion-arrow-left-b left-arrow" ng-click="toggleTimeLengthArrow()"></div>
+						Daily
+						<div class="icon ion-arrow-right-b right-arrow hide-me" ng-click="toggleTimeLengthArrow()"></div>
+					</div>
+				</ion-slide>
+			</ion-slide-box>
+			<ion-slide-box class="to-hide" delegate-handle="timeBox" show-pager="false" auto-play="false" active-slide="currentIndex" on-slide-changed="changeTime($index)">
+				<ion-slide ng-repeat = "timePeriod in weatherInformationForTime">
+					<div class = "dog-scroll-element">
+						<div class="icon ion-arrow-left-b left-arrow" ng-click="changeTimeArrow(false)" ng-if="!$first"></div>
+						<div class="icon ion-arrow-left-b left-arrow hide-me" ng-if="$first"></div>
+						{{timePeriod['time'].information}}
+						<div class="icon ion-arrow-right-b right-arrow" ng-click="changeTimeArrow(true)" ng-if="!$last"></div>
+						<div class="icon ion-arrow-left-b left-arrow hide-me" ng-if="$last"></div>
+					</div>
+				</ion-slide>
+			</ion-slide-box>
+			<ion-slide-box class="to-hide" delegate-handle="locationsBox" show-pager = "false" auto-play="false" on-slide-changed="changeLocations($index)">
+				<ion-slide ng-repeat = "location in locations">
+					<div class = "dog-scroll-element" on-hold="showDelete()">
+						<div class="icon ion-arrow-left-b left-arrow" ng-click="changeLocationsArrow(false)" ng-if="!$first"></div>
+						<div class="icon ion-arrow-left-b left-arrow hide-me" ng-if="$first"></div>
+						{{location['name']}}
+						<div class="icon ion-arrow-right-b right-arrow" ng-click="changeLocationsArrow(true)" ng-if="!$last"></div>
+						<div class="icon ion-arrow-left-b left-arrow hide-me" ng-if="$last"></div>
+					</div>
+				</ion-slide>
+			</ion-slide-box>
+		</div>	
+	</ion-content>
+	
+  </body>
+</html>
