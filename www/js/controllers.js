@@ -11,6 +11,14 @@ app.controller('MainCtrl',
 		$scope.timeIndex = 0;
 		$scope.locationToAdd = {};
 		
+		/* Toggle muted
+		*/
+		$scope.toggleMute = function() {
+			DisplayFactory.toggleMute();
+			save();
+		}
+		
+		
 		/* Toggle the dogs between stopped and moving
 		*/
 		$scope.toggleStopStart = function() {
@@ -55,6 +63,17 @@ app.controller('MainCtrl',
 			displayCurrentWeather();
 		}
 		
+		/* Toggle between daily and hourly by arrow
+		*/
+		$scope.toggleTimeLengthArrow = function() {
+			if($scope.timeLength === "Daily") {
+				$ionicSlideBoxDelegate.$getByHandle('periodBox').slide(0);
+			}
+			else {
+				$ionicSlideBoxDelegate.$getByHandle('periodBox').slide(1);	
+			}
+		}
+		
 		/* Change the shown time
 		 * @param	int		index		The index to change within the time array (either the city's hours array or days array) to change the time to
 		*/
@@ -76,14 +95,37 @@ app.controller('MainCtrl',
 			}
 		}
 		
+		/* Change the shown time after an arrow click
+		 * @param	boolean		next		True if advancing forward in the list
+		*/
+		$scope.changeTimeArrow = function(next) {
+			if(next) {
+				$ionicSlideBoxDelegate.$getByHandle('timeBox').next();
+			}
+			else {
+				$ionicSlideBoxDelegate.$getByHandle('timeBox').previous();
+			}
+		}
+		
 		/* Change the shown location
 		 * @param	int		index		The index to change within $scope.locations
 		*/
 		$scope.changeLocations = function(index) {
-			if(index != $scope.locationsIndex) {		
+			if(index != $scope.locationsIndex) {
 				$scope.locationsIndex = index;
 				displayCurrentWeather();
-				$scope.$apply();
+			}
+		}
+		
+		/* Change the shown location after an arrow click
+		 * @param	boolean		next		True if advancing forward in the list
+		*/
+		$scope.changeLocationsArrow = function(next) {
+			if(next) {
+				$ionicSlideBoxDelegate.$getByHandle('locationsBox').next();
+			}
+			else {
+				$ionicSlideBoxDelegate.$getByHandle('locationsBox').previous();
 			}
 		}
 		
@@ -163,18 +205,18 @@ app.controller('MainCtrl',
 			if($scope.popup) {
 				$scope.popup.close();
 			}
-			if(display) {
-				city.fetchWeather(displayCurrentWeather);
-			}
-			else {
-				city.fetchWeather(function() {return false;});
-			}
 			$scope.locations.push(city);
 			if(!goTo) {
 				$scope.locationsIndex = 0;
 			}
 			else {
 				$scope.locationsIndex = $scope.locations.length - 1;
+			}
+			if(display) {
+				city.fetchWeather(displayCurrentWeather);
+			}
+			else {
+				city.fetchWeather(function() {return false;});
 			}
 			save();
 		}
@@ -183,6 +225,7 @@ app.controller('MainCtrl',
 		*/
 		var displayCurrentWeather = function() {
 			var city = $scope.locations[$scope.locationsIndex];
+			
 			if(DisplayFactory.getDisplayHours()) {
 				$scope.weatherInformationForTime = $scope.locations[$scope.locationsIndex].hours;
 				city.setInfoOrder($scope.timeIndex, true);
@@ -243,12 +286,14 @@ app.controller('MainCtrl',
 				saveLocations.push( {'name':$scope.locations[i].name, 'longitude':$scope.locations[i].longitude, 'latitude':$scope.locations[i].latitude, 'timezoneOffset':$scope.locations[i].timezoneOffset, 'celcius':$scope.locations[i].celcius} );
 			}
 			window.localStorage['GreaterWeatherCities'] = JSON.stringify(saveLocations);
+			window.localStorage['GreaterWeatherMute'] = JSON.stringify(DisplayFactory.getMute());
 		} 
 		
 		/* Load the locations that are saved or load Charlotte's data if no save data exists
 		*/
 		var load = function() {
 			var loadedLocations = JSON.parse(window.localStorage['GreaterWeatherCities'] || "[]");
+			var loadedMute = JSON.parse(window.localStorage['GreaterWeatherMute'] || "[]");
 			var celcius = false;
 			
 			if(loadedLocations == 0) {
@@ -268,6 +313,12 @@ app.controller('MainCtrl',
 			}
 			if(celcius) {
 				document.getElementsByClassName('celcius-button')[0].innerHTML = "F";
+			}
+			console.log(loadedMute);
+			DisplayFactory.setMute(false);
+			if(loadedMute) {
+				console.log("llama baseball bananza!");
+				$scope.toggleMute();
 			}
 		}
 		

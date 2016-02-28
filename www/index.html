@@ -24,6 +24,7 @@
 		<button class="button icon ion-plus plus-button" ng-click="newLocation()"></button>
 		<button class="button icon celcius-button" ng-click="toggleDegrees()">C</button>
 		<div class="title">Greater Weather</div>
+		<button class="button icon ion-volume-mute mute-button" ng-click="toggleMute()"></button>
 		<button class="button icon ion-pause play-pause" ng-click="toggleStopStart()"></button>
     </ion-header-bar>
 	
@@ -48,18 +49,41 @@
 			</div>
 		</ion-scroll>
 		<div class="button-area">
-			<button class="button button-dark dog-button to-hide" ng-click="toggleTimeLength()">{{timeLength}}</button>
+			<ion-slide-box class="to-hide" delegate-handle="periodBox" show-pager="false" auto-play="false" on-slide-changed="toggleTimeLength()">
+				<ion-slide>
+					<div class = "dog-scroll-element">
+						<div class="icon ion-arrow-left-b left-arrow hide-me"></div>
+						Hourly
+						<div class="icon ion-arrow-right-b right-arrow" ng-click="toggleTimeLengthArrow()"></div>
+					</div>
+				</ion-slide>
+				<ion-slide>
+					<div class = "dog-scroll-element">
+						<div class="icon ion-arrow-left-b left-arrow" ng-click="toggleTimeLengthArrow()"></div>
+						Daily
+						<div class="icon ion-arrow-right-b right-arrow hide-me" ng-click="toggleTimeLengthArrow()"></div>
+					</div>
+				</ion-slide>
+			</ion-slide-box>
 			<ion-slide-box class="to-hide" delegate-handle="timeBox" show-pager="false" auto-play="false" active-slide="currentIndex" on-slide-changed="changeTime($index)">
 				<ion-slide ng-repeat = "timePeriod in weatherInformationForTime">
-					<div class = "button button-dark button-full dog-scroll-element">
+					<div class = "dog-scroll-element">
+						<div class="icon ion-arrow-left-b left-arrow" ng-click="changeTimeArrow(false)" ng-if="!$first"></div>
+						<div class="icon ion-arrow-left-b left-arrow hide-me" ng-if="$first"></div>
 						{{timePeriod['time'].information}}
+						<div class="icon ion-arrow-right-b right-arrow" ng-click="changeTimeArrow(true)" ng-if="!$last"></div>
+						<div class="icon ion-arrow-left-b left-arrow hide-me" ng-if="$last"></div>
 					</div>
 				</ion-slide>
 			</ion-slide-box>
 			<ion-slide-box class="to-hide" delegate-handle="locationsBox" show-pager = "false" auto-play="false" on-slide-changed="changeLocations($index)">
 				<ion-slide ng-repeat = "location in locations">
-					<div class = "button button-dark button-full dog-scroll-element" on-hold="showDelete()">
+					<div class = "dog-scroll-element" on-hold="showDelete()">
+						<div class="icon ion-arrow-left-b left-arrow" ng-click="changeLocationsArrow(false)" ng-if="!$first"></div>
+						<div class="icon ion-arrow-left-b left-arrow hide-me" ng-if="$first"></div>
 						{{location['name']}}
+						<div class="icon ion-arrow-right-b right-arrow" ng-click="changeLocationsArrow(true)" ng-if="!$last"></div>
+						<div class="icon ion-arrow-left-b left-arrow hide-me" ng-if="$last"></div>
 					</div>
 				</ion-slide>
 			</ion-slide-box>

@@ -181,7 +181,12 @@ app.factory('City',
 				this.hours[i] = {};
 				var resource;
 				resource = hoursData[i];
-				this.hours[i]['time'] = {'label':'Time', 'information':TimeFactory.epochToHour(hoursData[i].time + this.timezoneOffset + userOffset), 'actual':hoursData[i].time + this.timezoneOffset + userOffset};
+				if(i == 0) {
+					this.hours[i]['time'] = {'label':'Time', 'information':'Now', 'actual':hoursData[i].time + this.timezoneOffset + userOffset};
+				}
+				else {
+					this.hours[i]['time'] = {'label':'Time', 'information':TimeFactory.epochToHour(hoursData[i].time + this.timezoneOffset + userOffset), 'actual':hoursData[i].time + this.timezoneOffset + userOffset};
+				}
 				var temp = resource.temp;
 				var feelsTemp = resource.feels;
 				var celciusTemp = WeatherFactory.toCelcius(temp);
@@ -243,6 +248,9 @@ app.factory('City',
 				else {
 					this.days[i]['time'] = {'label':'Day', 'information':TimeFactory.epochToDayOfWeek(daysData[i].time + this.timezoneOffset + userOffset)};
 				}
+				//Make a copy, this works since this function is called after initializeHours
+				this.days[i].temperature = this.hours[i].temperature;
+				
 				var tempMax = daysData[i].high;
 				var tempMin = daysData[i].low;
 				var feelsTempMin = daysData[i].feelsLow;
@@ -295,8 +303,8 @@ app.factory('City',
 				}
 				this.days[i]['feelsHigh'] = {'label':"Feels High", 'information': displayFeelsTempMax + "°", 'actual':feelsTempMax, 'actualCelcius':celciusFeelsTempMax};
 				this.days[i]['feelsLow'] = {'label':"Feels Low", 'information': displayFeelsTempMin + "°", 'actual':feelsTempMin, 'actualCelcius':celciusFeelsTempMin};
-				this.days[i]['sunrise'] = {'label':"Sunrise", 'information': TimeFactory.epochToTime(daysData[i].sunrise + this.timezoneOffset + userOffset), 'actual': daysData[i].sunriseTime + this.timezoneOffset + userOffset};
-				this.days[i]['sunset'] = {'label':"Sunset", 'information': TimeFactory.epochToTime(daysData[i].sunset + this.timezoneOffset + userOffset), 'actual': daysData[i].sunsetTime + this.timezoneOffset + userOffset};
+				this.days[i]['sunrise'] = {'label':"Sunrise", 'information': TimeFactory.epochToTime(daysData[i].sunrise + this.timezoneOffset + userOffset), 'actual': daysData[i].sunrise + this.timezoneOffset + userOffset};
+				this.days[i]['sunset'] = {'label':"Sunset", 'information': TimeFactory.epochToTime(daysData[i].sunset + this.timezoneOffset + userOffset), 'actual': daysData[i].sunset + this.timezoneOffset + userOffset};
 				this.days[i]['windSpeed'] = {'label':"Wind Speed", 'information': daysData[i].windSpeed + "mph"};
 				this.days[i]['humidity'] = {'label':"Humidity", 'information': Math.round(daysData[i].humidity * 100) + "%"};
 				this.days[i]['moonPhase'] = {'label':"Moon Phase", 'information': Math.round(daysData[i].moonPhase * 100) + "%"};
@@ -321,10 +329,10 @@ app.factory('City',
 			else {
 				var precipAccumulation = this.days[index].precipAccumulation;
 				if(precipAccumulation != undefined) {
-					this.order = ['time','high','low', 'precipAccumulation', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy']; 
+					this.order = ['time','temperature','high','low', 'precipAccumulation', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy']; 
 				}
 				else {
-					this.order = ['time','high','low', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy'];
+					this.order = ['time','temperature','high','low', 'feelsHigh', 'feelsLow', 'sunrise', 'sunset', 'windSpeed', 'humidity', 'moonPhase', 'poweredBy'];
 				}
 			}
 		}
@@ -348,11 +356,26 @@ app.factory('DisplayFactory',
 		var dogSong = new Audio('snd/dogsong.mp3');
 		dogSong.loop = true;
 		var startedDogSong = false;
+		var mute = false;
 		
 		var HOT_TEMPERATURE = 50;
 		var STANDARD_WAIT_TIME = 700;
 		var TIME_BETWEEN_MOVEMENT = 20;
 		var TRAVEL_DISTANCE = 2;
+
+		/* Get whether the music is currently muted
+		 * @returns	boolean		If the music is muted
+		*/
+		DisplayFactory.getMute = function() {
+			return mute;
+		}
+		
+		/* Set whether the music is currently muted (for loading)
+		 * @param	boolean		newMute		What mute should be set to
+		*/
+		DisplayFactory.setMute = function(newMute) {
+			mute = newMute;
+		}
 		
 		/* Get whether the display is currently hourly
 		 * @returns	boolean		If the display is hourly
@@ -379,13 +402,33 @@ app.factory('DisplayFactory',
 			}
 			this.restartAnimation(true);
 		}
+		
+		/* Toggle between muted and unmuted
+		*/
+		DisplayFactory.toggleMute = function() {
+			if(mute) {
+				mute = false;
+				if(!stopped) {
+					dogSong.play();
+					startedDogSong = true;
+				}
+				document.getElementsByClassName('mute-button')[0].className = "button icon ion-volume-mute mute-button";
+			}
+			else {
+				mute = true;
+				dogSong.pause();
+				document.getElementsByClassName('mute-button')[0].className = "button icon ion-volume-medium mute-button";
+			}
+		}
 
 		/* Toggle the dogs between stopped and moving
 		*/
 		DisplayFactory.toggleStopStart = function() {
 			if(stopped) {
 				if(document.getElementsByClassName("scroll-section")[0].style.display != 'none') {
-					dogSong.play();
+					if(!mute) {
+						dogSong.play();
+					}
 					stopped = false;
 					animateCorgis();
 					//http://codepen.io/anon/pen/KpvdLp
@@ -499,6 +542,7 @@ app.factory('DisplayFactory',
 		*/
 		DisplayFactory.resetDogAreaWidth = function(length) {
 			$ionicSlideBoxDelegate.$getByHandle('timeBox').update();
+			$ionicSlideBoxDelegate.$getByHandle('periodBox').update();
 			document.getElementsByClassName('dog-area')[0].style.width = (length) * 50 + "%";
 			$ionicScrollDelegate.resize();
 		}
@@ -515,10 +559,18 @@ app.factory('DisplayFactory',
 			this.showButtons();
 			this.restartAnimation(true);
 			if(!startedDogSong) {
-				dogSong.play();
-				startedDogSong = true;
+				if(!mute) {
+					dogSong.play();
+					startedDogSong = true;
+				}
 			}
 			document.getElementsByClassName("scroll-section")[0].style.display = 'flex';
+			$ionicSlideBoxDelegate.update();
+			//This is a workaround to a strange display glitch
+			//that possibly has to do with loading issues
+			//(The time slide box will be blank until the window is resized)
+			$ionicSlideBoxDelegate.$getByHandle('timeBox').slide(6);
+			$ionicSlideBoxDelegate.$getByHandle('timeBox').slide(0);
 		}
 		
 		/* Choose the appropriate background based on the weather

@@ -14,7 +14,7 @@ body {
 	background-position: center top;
 }
 
-.play-pause, .plus-button, .cancel-button, .check-button, .celcius-button  {
+.play-pause, .plus-button, .cancel-button, .check-button, .celcius-button, .mute-button  {
 	background: none !important;
 }
 
@@ -26,8 +26,12 @@ body {
 	border: none;
 }
 
+.mute-button {
+	margin-left: auto;
+}
+
 .celcius-button {
-	padding-left: 30px !important;
+	font-size: 130% !important;
 }
 
 .main-section {
@@ -110,7 +114,7 @@ body {
 
 .dog-bar {
 	background-color: black !important;
-	opacity: 0.85 !important;
+	opacity: 0.9 !important;
 }
 
 .title {
@@ -120,7 +124,7 @@ body {
 .dog-button {
 	font-family: dtmsans;
 	background-color: black !important;
-	opacity: 0.85 !important;
+	opacity: 0.9 !important;
 	color: white;
 	height: 45px;
 	border-bottom: 0px !important;
@@ -139,11 +143,13 @@ body {
 	border-color: green !important;
 	font-family: dtmsans;
 	background-color: black !important;
-	opacity: 0.85 !important;
+	opacity: 0.9 !important;
 	color: white;
-	height: 45px;
-	display: block;
-	position: abosulte;
+	height: 100%;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	font-size: 16px;
 }
 
 .popup {
@@ -181,4 +187,22 @@ body {
 
 .to-hide {
 	display: none;
+}
+
+.right-arrow {
+	display: block;
+	float: right;
+	padding: 10px;
+	margin-left:auto;
+}
+
+.left-arrow {
+	display: block;
+	float: left;
+	padding: 10px;
+	margin-right:auto;
+}
+
+.hide-me {
+	visibility: hidden;
 }
